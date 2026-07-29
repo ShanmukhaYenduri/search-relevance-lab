@@ -1,0 +1,23 @@
+{
+  "name": "search-relevance-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lexical, fuzzy, semantic and hybrid retrieval over one Postgres table, with an offline relevance harness",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node db/seed.js",
+    "eval": "node eval/evaluate.js",
+    "up": "docker compose up --build",
+    "down": "docker compose down -v",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  },
+  "license": "MIT"
+}
