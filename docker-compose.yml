@@ -1,0 +1,59 @@
+# search-relevance-lab -- local stack
+#
+# pgvector's image rather than plain postgres, because the vector extension has
+# to be present before schema.sql runs. Tag is pinned: an unpinned :latest means
+# the index behaviour can change under you between two runs of the same eval,
+# and then you are debugging Docker instead of your ranker.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: search
+      POSTGRES_PASSWORD: search
+      POSTGRES_DB: search
+    ports:
+      - "5432:5432"
+    volumes:
+      # Runs once, on an empty data directory. If you change schema.sql you have
+      # to docker compose down -v, not just restart -- a surprising number of
+      # confusing evenings start here.
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      # Enough shared_buffers that a 20-document corpus is warm, and a lowered
+      # random_page_cost so the planner stops assuming spinning disks. Both are
+      # here to make EXPLAIN output stable between runs, which is the only way
+      # the plans quoted in the README stay honest.
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "track_io_timing=on"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U search -d search"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    depends_on:
+      postgres:
+        # Not just 'started'. Without the healthcheck condition the API races the
+        # database on every cold boot and the first run always looks broken.
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://search:search@postgres:5432/search
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: sh -c "npm ci --omit=dev && npm run seed && npm start"
+
+volumes:
+  pgdata:
