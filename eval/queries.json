@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "query": "postgres full text search",
+    "note": "Plain lexical query. Both legs should nail this; it is the control.",
+    "relevant": { "1": 3, "2": 3, "3": 2, "12": 1 }
+  },
+  {
+    "id": 2,
+    "query": "tsvector",
+    "note": "Single rare token. Lexical should win outright -- a hashed or learned embedding has little to say about a token this specific.",
+    "relevant": { "1": 3, "2": 2 }
+  },
+  {
+    "id": 3,
+    "query": "why is my query slow",
+    "note": "Intent, not keywords. None of these documents contain the word 'slow' in the title, so this is where lexical retrieval alone starts to hurt.",
+    "relevant": { "4": 3, "5": 3, "3": 2, "6": 1 }
+  },
+  {
+    "id": 4,
+    "query": "stale cache",
+    "note": "Two common words that only mean something together.",
+    "relevant": { "7": 3, "8": 3, "9": 1 }
+  },
+  {
+    "id": 5,
+    "query": "postgre full text serach",
+    "note": "Two typos on purpose. Tests the trigram fallback path in hybrid().",
+    "relevant": { "1": 3, "2": 3, "3": 2 }
+  },
+  {
+    "id": 6,
+    "query": "kafka vs queue",
+    "note": "The tradeoff question from my profile, asked the way someone would actually type it.",
+    "relevant": { "10": 3, "11": 2 }
+  },
+  {
+    "id": 7,
+    "query": "autocomplete",
+    "note": "Head term with several plausible answers. Ranking matters more than recall here.",
+    "relevant": { "12": 3, "13": 3, "14": 2 }
+  },
+  {
+    "id": 8,
+    "query": "index not being used",
+    "note": "The failure mode I care most about catching, phrased as a symptom.",
+    "relevant": { "5": 3, "4": 2, "15": 2 }
+  },
+  {
+    "id": 9,
+    "query": "rank search results",
+    "note": "Ambiguous between BM25-style scoring and business signals. Both are legitimate; graded relevance is how you say that.",
+    "relevant": { "3": 3, "16": 3, "17": 2, "1": 1 }
+  },
+  {
+    "id": 10,
+    "query": "vector similarity search",
+    "note": "Semantic-flavoured but with exact tokens present, so both legs should contribute and RRF should beat either one alone.",
+    "relevant": { "18": 3, "19": 3, "20": 2 }
+  },
+  {
+    "id": 11,
+    "query": "p95 latency budget",
+    "note": "Cross-links to sub-200ms-stack. Rare token 'p95' plus a common phrase.",
+    "relevant": { "6": 3, "9": 2 }
+  },
+  {
+    "id": 12,
+    "query": "zzzz no results expected",
+    "note": "The empty case. A search box that returns a stack trace on nonsense input is a search box nobody trusts.",
+    "relevant": {}
+  }
+]
